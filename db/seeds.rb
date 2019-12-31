@@ -5,7 +5,6 @@ Ticket.create(user_id: 3, event_id: 2)
 Ticket.create(user_id: 6, event_id: 4)
 Ticket.create(user_id: 7, event_id: 5)
 
-
 User.create(name: 'Barry', organiser?: false)
 User.create(name: 'Jerry', organiser?: true)
 User.create(name: 'Perry', organiser?: false)
