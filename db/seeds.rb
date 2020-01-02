@@ -61,9 +61,9 @@ City.create(name: 'Tokyo')
 
 
 Venue.create(name: 'The Leaky Scrotum' , venue_type: 'Pub', city_id: 1)
-Venue.create(name: 'The Leaky Duck' , venue_type: 'Bar', city_id: 1)
+Venue.create(name: 'The  Duck' , venue_type: 'Bar', city_id: 1)
 Venue.create(name: 'The Leaky Kettle' , venue_type: 'Club', city_id: 2)
-Venue.create(name: 'The Leaky Pan' , venue_type: 'Casino', city_id: 2)
-Venue.create(name: 'The Leaky Bucket' , venue_type: 'Stadium', city_id: 2)
+Venue.create(name: 'Ja  Pan' , venue_type: 'Casino', city_id: 2)
+Venue.create(name: 'Tokyo  Bucket' , venue_type: 'Stadium', city_id: 2)
 
 
