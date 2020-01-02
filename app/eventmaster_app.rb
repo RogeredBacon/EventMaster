@@ -19,14 +19,6 @@ class EventMasterApp
             print "Please type a valid option: "
             user_input = gets.chomp
         end
-        # if choice == "New User" 
-        #     new_user 
-        # elsif choice == "Login"
-        #     login 
-        # else 
-        #     puts "Goodbye" 
-        #     exit
-        # end 
     end 
 
     def new_user
@@ -97,12 +89,25 @@ class EventMasterApp
         #select a ticket
         #write a review
         #total money spent
-        puts '4. See all my reviews'
+        puts '3. See all my reviews'
         #select a review
         #update review
         #delete review
         puts "4. Delete my account"
 
+        user_prompt_option = gets.chomp
+        case user_prompt_option 
+        when "1"
+            show_available_events(user)
+        when '2'
+            see_my_tickets(user)
+        when '3'
+            see_my_reviews(user)
+        when "4"
+            User.delete_user(user.name)
+            puts 'User terminated...Goodbye'
+            exit
+        end
         end
 
         user_prompt_option = gets.chomp
@@ -247,5 +252,17 @@ def see_my_reviews(user, event)
         avg.push(review.rating)
         }}
        puts "Your average rating is: #{avg.sum / avg.count}"
+end
+
+def show_available_events(user)
+
+end
+
+def see_my_tickets(user)
+
+end
+
+def see_my_reviews(user)
+
 end
 end
