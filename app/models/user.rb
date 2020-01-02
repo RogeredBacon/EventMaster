@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
     end
 
     def self.delete_user(name, organiser_bool)
-        user = login_user(name, organiser_bool)
+        user = fetch_user(name, organiser_bool)
         User.destroy(user.id)
     end
 
@@ -111,6 +111,12 @@ class User < ActiveRecord::Base
 
         def delete_my_review(ticket_id)
             review = select_my_review(ticket_id)
-        Review.destroy( review.ids)
+            Review.destroy( review.ids)
         end
+
+        def select_a_ticket_for_user(event_id)
+            Event.all.where(event_id:event_id)
+        end
+
+
 end

@@ -8,4 +8,5 @@ class CreateReviews < ActiveRecord::Migration[5.2]
       t.timestamp :created_on
     end
   end
-end
+
+

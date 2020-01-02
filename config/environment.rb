@@ -8,7 +8,8 @@ ActiveRecord::Base.establish_connection(
 )
 
 # Set up logging for our ActiveRecord database connection. This means that whenever we call an ActiveRecord method that interacts with our database, it will output the resulting SQL to the terminal. To turn this off, simply change this line to ActiveRecord::Base.logger = nil
-ActiveRecord::Base.logger = Logger.new(STDOUT)
+#ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.logger = nil
 
 # Uses a gem called require-all to pull all the code from every file in the app folder into this file
 require_all 'app'
