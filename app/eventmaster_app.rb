@@ -67,6 +67,7 @@ class EventMasterApp
         puts '1. Add a new event'
         puts "2. See my events"
         puts "3. Delete my account"
+        puts '4. Exit'
         
         user_prompt_option = gets.chomp
         case user_prompt_option 
@@ -76,7 +77,11 @@ class EventMasterApp
             see_my_events(user)
         when "3"
             User.delete_user(user.name)
+            puts 'Sorry to see you go'
             puts 'User terminated...Goodbye'
+            exit
+        when '4'
+            puts 'Goodbye'
             exit
         end
         else
@@ -94,6 +99,7 @@ class EventMasterApp
         #update review
         #delete review
         puts "4. Delete my account"
+        puts '5. Exit'
 
         user_prompt_option = gets.chomp
         case user_prompt_option 
@@ -104,8 +110,12 @@ class EventMasterApp
         when '3'
             see_my_reviews(user)
         when "4"
+            puts 'Sorry to see you go'
             User.delete_user(user.name)
             puts 'User terminated...Goodbye'
+            exit
+        when '5'
+            puts 'Goodbye'
             exit
         end
         end
@@ -120,12 +130,12 @@ class EventMasterApp
             events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}"}
             print "Select one of the listed events: "
             ticket_user_input = gets.chomp.to_i
-            event_id = ticket_user_input
+            ticket_id = ticket_user_input
             puts "you have selected #{event.title}, at #{event.address}, on #{event.date}"
             puts "Would you like to buy the ticket for this event? Yes/No"
             answer_to_buy = gets.chomp.titleize
             if answer_to_buy == "Yes"
-                buy_ticket(event_id)
+                buy_ticket(ticket_id)
             else
                 prompt_user
             end
@@ -143,12 +153,12 @@ class EventMasterApp
 
     def see_my_events(user)
         puts "Here are all your events!"
+        puts 'Please select from the numbered events'
         events = user.select_my_events
         events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}"}
-        puts 'Please select from the numbered events'
-        event_id = gets.chomp.to_i 
-        event_id  -= 1
-        event = events[event_id]
+        ticket_id = gets.chomp.to_i 
+        ticket_id  -= 1
+        event = events[ticket_id]
         puts "you have selected #{event.title}, at #{event.address}, on #{event.date}"
         puts 'What would you like to do?'
         puts '1. You can update the event details'
@@ -156,6 +166,7 @@ class EventMasterApp
         puts '3. You can make an event unavailable'
         puts '4. See whos attending the event'
         puts '5. Delete the event'
+        puts '0. Go back'
 
         user_prompt_option = gets.chomp
         case user_prompt_option 
@@ -178,12 +189,9 @@ class EventMasterApp
             user.delete_my_event(event.title)
             puts 'Updated. Event deleted'
             prompt_user(user)
+        when '0'
+            prompt_user(user)
         end
-
-#update
-#view reviews
-#set unavailable
-#see whos attending
 
     end
 
@@ -245,24 +253,90 @@ end
 
 def see_my_reviews(user, event)
     avg = []
-    puts 'Here are the reviews for your event:'
     reviews = user.my_event_reviews(event.id)
+    if reviews.count > 0
+    puts 'Here are the reviews for your event:'
     reviews.map{|obj| obj.each_with_index{|review, i|
         puts "#{review.description}, #{review.rating}, #{review.user.name}"
         avg.push(review.rating)
         }}
        puts "Your average rating is: #{avg.sum / avg.count}"
+    else
+        puts 'Sorry this event has no reviews yet :('
+    end
 end
 
 def show_available_events(user)
+    puts "Here are all the available events!"
+    puts 'Please select from the events you want to view'
+    events = Event.all.where(available?: true)
+    events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}, #{event.price}"}
+        ticket_id = gets.chomp.to_i 
+        ticket_id  -= 1
+        event = events[ticket_id]
+        puts "The event is called #{event.title}"
+        puts "The event is about #{event.description}"
+        puts "The event is at #{event.address}"
+        puts "The events type #{event.event_type}"
+        puts "The event is priced at £#{event.price}"
+        puts "The event is happening on #{event.date}"
+        puts "The event is happening at the #{event.venue.name} venue"
+        puts "The event is in the city of #{event.venue.city.name}"
+
+        puts "\nWhat would you like to do?"
+        puts '1. Buy a ticket for this event?'
+        puts '0. Go back'
+
+        user_prompt_option = gets.chomp
+        case user_prompt_option 
+        when "1"
+            user.buy_ticket(event.id)
+            puts 'Ticket bought! See you there.'
+            prompt_user(user)
+        when '0'
+            prompt_user(user)
+        end
+
 
 end
 
 def see_my_tickets(user)
+    #select a ticket
+    #write a review
+    #total money spent
+    puts "Here are all of your tickets!"
+    puts 'Please select the ticket you want to view'
+    tickets = Ticket.all.where(user_id: user.id)
+    tickets.each_with_index{|ticket, i|puts "#{i+1}. #{ticket.event.title}, #{ticket.event.address}, #{ticket.event.date}, #{ticket.event.price}"}
+        puts "\nYou've spent £#{user.total_money_spent} in total on tickets."
+        ticket_id = gets.chomp.to_i 
+        ticket_id  -= 1
+        ticket = tickets[ticket_id]
+
+        puts "\nWhat would you like to do?"
+        puts '1. Would you like to write a review this event?'
+        puts '0. Go back'
+
+        user_prompt_option = gets.chomp
+        case user_prompt_option 
+        when "1"
+            write_a_review(user, ticket)
+            puts 'Ticket reviewed! Thanks for your feedback.'
+            prompt_user(user)
+        when '0'
+            prompt_user(user)
+        end
+end
+
+def see_my_written_reviews(user)
 
 end
 
-def see_my_reviews(user)
-
+def write_a_review(user, ticket)
+    puts 'Please provide feedback on the event'
+    description = gets.chomp
+    puts 'Please rate this event out of 5'
+    rating = gets.chomp.to_f
+    user.create_review(description, rating, ticket.id)
 end
 end
