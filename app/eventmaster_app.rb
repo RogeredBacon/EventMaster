@@ -27,7 +27,7 @@ class EventMasterApp
 
         if user_or_organiser == 1
             puts "Please enter your username"
-            name = gets.chomp
+            name = gets.chomp.titleize
             if User.fetch_user(name)
                 puts 'Sorry this user already exists'
                 puts ' Please select a different username'
