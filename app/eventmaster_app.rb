@@ -7,7 +7,7 @@ class EventMasterApp
         puts "1. New User"
         puts "2. Login"
         puts "3. Exit"
-        user_input = gets.chomp #("Choose an option" ["New User", "Login", "Exit"])
+        user_input = gets.chomp
         case user_input
         when "1"
             new_user
@@ -88,16 +88,8 @@ class EventMasterApp
 
         puts "Please select from the following options: "
         puts '1. Show available events'
-        #select event
-        #buy ticket
         puts "2. See my tickets"
-        #select a ticket
-        #write a review
-        #total money spent
         puts '3. See all my reviews'
-        #select a review
-        #update review
-        #delete review
         puts "4. Delete my account"
         puts '5. Exit'
 
@@ -108,7 +100,7 @@ class EventMasterApp
         when '2'
             see_my_tickets(user)
         when '3'
-            see_my_reviews(user)
+            see_my_written_reviews(user)
         when "4"
             puts 'Sorry to see you go'
             User.delete_user(user.name)
@@ -119,37 +111,7 @@ class EventMasterApp
             exit
         end
         end
-
-        user_prompt_option = gets.chomp
-        case user_prompt_option 
-        when "1"
-            all_my_tickets
-        when "2"
-            # Event.all
-            events = Event.all
-            events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}"}
-            print "Select one of the listed events: "
-            ticket_user_input = gets.chomp.to_i
-            ticket_id = ticket_user_input
-            puts "you have selected #{event.title}, at #{event.address}, on #{event.date}"
-            puts "Would you like to buy the ticket for this event? Yes/No"
-            answer_to_buy = gets.chomp.titleize
-            if answer_to_buy == "Yes"
-                buy_ticket(ticket_id)
-            else
-                prompt_user
-            end
-
-
-        when "3"
-            create_review
-        when "4"
-            total_money_spent
-        else
-            print "Please type a valid option: "
-            user_prompt_option = gets.chomp
-        end
-    end 
+    end
 
     def see_my_events(user)
         puts "Here are all your events!"
@@ -195,7 +157,7 @@ class EventMasterApp
 
     end
 
-   def add_event(user)
+ def add_event(user)
     puts 'Please enter a Title'
     title = gets.chomp
     puts 'Please enter a description'
@@ -301,9 +263,6 @@ def show_available_events(user)
 end
 
 def see_my_tickets(user)
-    #select a ticket
-    #write a review
-    #total money spent
     puts "Here are all of your tickets!"
     puts 'Please select the ticket you want to view'
     tickets = Ticket.all.where(user_id: user.id)
@@ -329,7 +288,31 @@ def see_my_tickets(user)
 end
 
 def see_my_written_reviews(user)
+    puts "Here are all of your reviews!"
+    puts 'Please select the review you want to change'
+    reviews = user.all_my_reviews
+    reviews.each_with_index{|review, i|puts "#{i+1}. #{review.description}, #{review.rating}, #{review.ticket.event.title}, #{review.ticket.event.price}"}
+        review_id = gets.chomp.to_i 
+        review_id  -= 1
+        review = reviews[review_id]
+        puts "\nWhat would you like to do?"
+        puts '1. Would you like to edit the review for this event?'
+        puts '2. Would you like to delete the review for this event?'
+        puts '0. Go back'
 
+        user_prompt_option = gets.chomp
+        case user_prompt_option 
+        when "1"
+            edit_a_review(user, review)
+            puts 'Review changed! Thanks for your feedback.'
+            prompt_user(user)
+        when '2'
+            user.delete_my_review(review.ticket_id)
+            puts 'Review deleted!'
+            prompt_user(user)
+        when '0'
+            prompt_user(user)
+        end
 end
 
 def write_a_review(user, ticket)
@@ -339,4 +322,12 @@ def write_a_review(user, ticket)
     rating = gets.chomp.to_f
     user.create_review(description, rating, ticket.id)
 end
+
+    def edit_a_review(user, review)
+        puts 'Please update your feedback'
+        description = gets.chomp
+        puts 'Please update your rating'
+        rating = gets.chomp
+        user.update_my_review(description, rating, review.ticket_id)
+    end
 end

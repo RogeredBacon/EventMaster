@@ -104,7 +104,7 @@ class User < ActiveRecord::Base
               Review.where(user_id: self.id, ticket_id: ticket_id)
                 end
 
-            def update_my_review(title, description, rating, ticket_id)
+            def update_my_review(description, rating, ticket_id)
                 review = select_my_review(ticket_id)
                 review.update(
                     description: description,
