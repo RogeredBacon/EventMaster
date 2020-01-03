@@ -1,13 +1,26 @@
 class EventMasterApp
     require 'pry'
 
-    def welcome 
-        puts "Welcome to Eventmaster!"
-        puts "Please select from the following options:"
-        puts "1. New User"
-        puts "2. Login"
-        puts "3. Exit"
+    def logo 
+
+        puts"
+        ███████╗██╗░░░██╗███████╗███╗░░██╗████████╗███╗░░░███╗░█████╗░░██████╗████████╗███████╗██████╗░
+        ██╔════╝██║░░░██║██╔════╝████╗░██║╚══██╔══╝████╗░████║██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗
+        █████╗░░╚██╗░██╔╝█████╗░░██╔██╗██║░░░██║░░░██╔████╔██║███████║╚█████╗░░░░██║░░░█████╗░░██████╔╝
+        ██╔══╝░░░╚████╔╝░██╔══╝░░██║╚████║░░░██║░░░██║╚██╔╝██║██╔══██║░╚═══██╗░░░██║░░░██╔══╝░░██╔══██╗
+        ███████╗░░╚██╔╝░░███████╗██║░╚███║░░░██║░░░██║░╚═╝░██║██║░░██║██████╔╝░░░██║░░░███████╗██║░░██║
+        ╚══════╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝"
+        end
+
+    def welcome
+        logo
+        puts "\n WELCOME TO EVENTMASTER!"
+        puts "\n Please select from the following options:"
+        puts "\n 1. New User"
+        puts "\n 2. Login"
+        puts "\n 3. Exit"
         user_input = gets.chomp
+        while user_input != "3"
         case user_input
         when "1"
             new_user
@@ -19,15 +32,17 @@ class EventMasterApp
             print "Please type a valid option: "
             user_input = gets.chomp
         end
+    end
     end 
 
     def new_user
-        puts "Please select 1 if you are a User or 2 if you are event Organiser"
+        puts "Press 1 to signup as a customer"
+        puts "Press 2 to signup as an event organiser"
+        user_or_organiser = ''
         user_or_organiser = gets.chomp.to_i
-
         if user_or_organiser == 1
             puts "Please enter your username"
-            name = gets.chomp
+            name = gets.chomp.titleize
             if User.fetch_user(name)
                 puts 'Sorry this user already exists'
                 puts ' Please select a different username'
@@ -46,17 +61,27 @@ class EventMasterApp
         else
             print "Please type a valid option: "
             user_or_organiser = gets.chomp
+            new_user
         end
         prompt_user(user)
+        puts 'Goodbye'
+        exit
     end 
 
 
     def login
-        puts "Please enter your username:"
+        print "Please enter your username: "
         name = gets.chomp.titleize
         user = User.fetch_user(name)
+        while !user
+            print "Please enter a valid username: "
+            name = gets.chomp.titleize
+            user = User.fetch_user(name)
+        end
         puts "Welcome back #{user.name}"
         prompt_user(user)
+        puts 'Goodbye'
+        exit
     end
 
     def prompt_user(user)
@@ -70,12 +95,13 @@ class EventMasterApp
         puts '4. Exit'
         
         user_prompt_option = gets.chomp
+        while user_prompt_option != '0'
         case user_prompt_option 
-        when "1"
+        when '1'
             add_event(user)
         when '2'
             see_my_events(user)
-        when "3"
+        when '3'
             User.delete_user(user.name)
             puts 'Sorry to see you go'
             puts 'User terminated...Goodbye'
@@ -83,6 +109,10 @@ class EventMasterApp
         when '4'
             puts 'Goodbye'
             exit
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
+        end
         end
         else
 
@@ -94,6 +124,7 @@ class EventMasterApp
         puts '5. Exit'
 
         user_prompt_option = gets.chomp
+        while user_prompt_option != '0'
         case user_prompt_option 
         when "1"
             show_available_events(user)
@@ -109,7 +140,11 @@ class EventMasterApp
         when '5'
             puts 'Goodbye'
             exit
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
         end
+    end
         end
     end
 
@@ -118,7 +153,11 @@ class EventMasterApp
         puts 'Please select from the numbered events'
         events = user.select_my_events
         events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}"}
-        ticket_id = gets.chomp.to_i 
+        puts "\n0. Back"
+        ticket_id = gets.chomp.to_i
+        if ticket_id == 0
+            prompt_user(user)
+        end
         ticket_id  -= 1
         event = events[ticket_id]
         puts "you have selected #{event.title}, at #{event.address}, on #{event.date}"
@@ -131,6 +170,7 @@ class EventMasterApp
         puts '0. Go back'
 
         user_prompt_option = gets.chomp
+        while user_prompt_option != '*'
         case user_prompt_option 
         when "1"
             update_event(user, event)
@@ -153,8 +193,11 @@ class EventMasterApp
             prompt_user(user)
         when '0'
             prompt_user(user)
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
         end
-
+    end
     end
 
  def add_event(user)
@@ -166,8 +209,12 @@ class EventMasterApp
     address = gets.chomp
     puts 'Please enter an event type'
     event_type = gets.chomp
-    puts 'Please enter a prcice'
+    puts 'Please enter a price'
     price = gets.chomp.to_i
+    while price == 0
+        puts 'Please a valid price'
+        price = gets.chomp.to_i
+    end
     puts 'Please enter an date'
     date = gets.chomp
     puts 'Please select a venue'
@@ -194,6 +241,10 @@ def update_event(user, event)
     event_type = gets.chomp
     puts 'Please enter a new prcice'
     price = gets.chomp.to_i
+    while price == 0
+        puts 'Please a valid price'
+        price = gets.chomp.to_i
+    end
     puts 'Please enter a new date'
     date = gets.chomp
     puts 'Please select a new venue'
@@ -233,7 +284,11 @@ def show_available_events(user)
     puts 'Please select from the events you want to view'
     events = Event.all.where(available?: true)
     events.each_with_index{|event, i|puts "#{i+1}. #{event.title}, #{event.address}, #{event.date}, #{event.price}"}
-        ticket_id = gets.chomp.to_i 
+        puts "\n0. Back"
+        ticket_id = gets.chomp.to_i
+        if ticket_id == 0
+            prompt_user(user)
+        end
         ticket_id  -= 1
         event = events[ticket_id]
         puts "The event is called #{event.title}"
@@ -250,6 +305,7 @@ def show_available_events(user)
         puts '0. Go back'
 
         user_prompt_option = gets.chomp
+        while user_prompt_option != '*'
         case user_prompt_option 
         when "1"
             user.buy_ticket(event.id)
@@ -257,7 +313,11 @@ def show_available_events(user)
             prompt_user(user)
         when '0'
             prompt_user(user)
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
         end
+    end
 
 
 end
@@ -268,7 +328,11 @@ def see_my_tickets(user)
     tickets = Ticket.all.where(user_id: user.id)
     tickets.each_with_index{|ticket, i|puts "#{i+1}. #{ticket.event.title}, #{ticket.event.address}, #{ticket.event.date}, #{ticket.event.price}"}
         puts "\nYou've spent £#{user.total_money_spent} in total on tickets."
-        ticket_id = gets.chomp.to_i 
+        puts "\n0. Back"
+        ticket_id = gets.chomp.to_i
+        if ticket_id == 0
+            prompt_user(user)
+        end
         ticket_id  -= 1
         ticket = tickets[ticket_id]
 
@@ -277,6 +341,7 @@ def see_my_tickets(user)
         puts '0. Go back'
 
         user_prompt_option = gets.chomp
+        while user_prompt_option != '*'
         case user_prompt_option 
         when "1"
             write_a_review(user, ticket)
@@ -284,7 +349,11 @@ def see_my_tickets(user)
             prompt_user(user)
         when '0'
             prompt_user(user)
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
         end
+    end
 end
 
 def see_my_written_reviews(user)
@@ -292,7 +361,11 @@ def see_my_written_reviews(user)
     puts 'Please select the review you want to change'
     reviews = user.all_my_reviews
     reviews.each_with_index{|review, i|puts "#{i+1}. #{review.description}, #{review.rating}, #{review.ticket.event.title}, #{review.ticket.event.price}"}
-        review_id = gets.chomp.to_i 
+    puts "\n0. Back"
+    review_id = gets.chomp.to_i
+    if review_id == 0
+        prompt_user(user)
+    end
         review_id  -= 1
         review = reviews[review_id]
         puts "\nWhat would you like to do?"
@@ -301,6 +374,7 @@ def see_my_written_reviews(user)
         puts '0. Go back'
 
         user_prompt_option = gets.chomp
+        while user_prompt_option != '*'
         case user_prompt_option 
         when "1"
             edit_a_review(user, review)
@@ -312,7 +386,11 @@ def see_my_written_reviews(user)
             prompt_user(user)
         when '0'
             prompt_user(user)
+        else
+            puts 'Please enter a valid option'
+            user_prompt_option = gets.chomp
         end
+    end
 end
 
 def write_a_review(user, ticket)
@@ -320,6 +398,10 @@ def write_a_review(user, ticket)
     description = gets.chomp
     puts 'Please rate this event out of 5'
     rating = gets.chomp.to_f
+    while rating > 5.0 || rating < 0.0
+        puts 'Please enter a valid rating'
+        rating = gets.chomp.to_f
+    end
     user.create_review(description, rating, ticket.id)
 end
 
@@ -327,7 +409,13 @@ end
         puts 'Please update your feedback'
         description = gets.chomp
         puts 'Please update your rating'
-        rating = gets.chomp
+        rating = gets.chomp.to_f
+        while rating > 5 || rating < 0
+            puts 'Please enter a valid rating'
+            rating = gets.chomp.to_f
+        end
         user.update_my_review(description, rating, review.ticket_id)
     end
 end
+
+
