@@ -7,12 +7,12 @@ class User < ActiveRecord::Base
         User.create(name: name, organiser?: organiser_bool)
     end
 
-    def self.fetch_user(name, organiser_bool)
-        User.find_by(name: name, organiser?: organiser_bool)
+    def self.fetch_user(name)
+        User.find_by(name: name)
     end
 
-    def self.delete_user(name, organiser_bool)
-        user = login_user(name, organiser_bool)
+    def self.delete_user(name)
+        user = fetch_user(name)
         User.destroy(user.id)
     end
 
@@ -33,12 +33,16 @@ class User < ActiveRecord::Base
         Event.where(organiser_id: self.id)
     end
 
-        def find_my_event(title)
+        def find_my_event_title(title)
         Event.where(organiser_id: self.id, title: title)
         end
 
-    def update_my_event(titleold, titlenew, description, address, event_type, price, date, available, venue_id)
-        event = find_my_event(titleold)
+        def find_my_event_id(event_id)
+        Event.where(event_id: event_id)
+        end
+
+    def update_my_event(titleold, titlenew, description, address, event_type, price, date, venue_id)
+        event = find_my_event_title(titleold)
         event.update(title: titlenew,
             description: description,
             address: address,
@@ -65,7 +69,7 @@ class User < ActiveRecord::Base
     end
 
         def delete_my_event(title)
-        Event.destroy( self.find_my_event(title).ids)
+        Event.destroy( self.find_my_event_title(title).ids)
         end
 
         def buy_ticket(event_id)
@@ -100,7 +104,7 @@ class User < ActiveRecord::Base
               Review.where(user_id: self.id, ticket_id: ticket_id)
                 end
 
-            def update_my_review(title, description, rating, ticket_id)
+            def update_my_review(description, rating, ticket_id)
                 review = select_my_review(ticket_id)
                 review.update(
                     description: description,
@@ -111,6 +115,12 @@ class User < ActiveRecord::Base
 
         def delete_my_review(ticket_id)
             review = select_my_review(ticket_id)
-        Review.destroy( review.ids)
+            Review.destroy( review.ids)
         end
+
+        def select_a_ticket_for_user(event_id)
+            Event.all.where(event_id:event_id)
+        end
+
+
 end
